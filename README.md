@@ -1,3 +1,4 @@
 # Music Generation
 
-Contact: hongyi.huang-3@postgrad.manchester.ac.uk
+## Contact
+E-Mail: hongyi.huang-3@postgrad.manchester.ac.uk

@@ -1,7 +1,6 @@
 .idea
 
 datasets
-preprocess
 
 tmp*
 dev*

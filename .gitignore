@@ -5,3 +5,7 @@ datasets
 tmp*
 dev*
 test*
+
+train_log*
+
+wandb/

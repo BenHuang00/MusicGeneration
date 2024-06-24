@@ -26,7 +26,7 @@ def preprocess_tokens2ids(tokens, tokens2ids_path, ids2tokens_path):
     return token2id, id2token
 
 
-def preprocess_dataset(cfg, metadata, tokens2ids):
+def preprocess_dataset(metadata, tokens2ids):
     split_data = []
     not_found_list = []
     for key, value in tqdm(metadata.items(), desc='Preprocessing dataset'):
@@ -53,7 +53,7 @@ def preprocess_dataset(cfg, metadata, tokens2ids):
     print(f'Saved dataset: {len(dataset)} windows')
 
 
-def preprocess(cfg):
+def preprocess():
     dataset_all_metadata_path = os.path.join(cfg.dataset_path, cfg.dataset_all_metadata_name)
     dataset_all_tokens_path = os.path.join(cfg.dataset_path, cfg.dataset_all_tokens_name)
 
@@ -71,7 +71,7 @@ def preprocess(cfg):
     tokens2ids, ids2tokens = preprocess_tokens2ids(tokens, tokens2ids_path, ids2tokens_path)
 
     print('Preprocessing dataset...')
-    preprocess_dataset(cfg, metadata, tokens2ids)
+    preprocess_dataset(metadata, tokens2ids)
 
 
 if __name__ == '__main__':
@@ -89,11 +89,11 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    my_cfg = config
-    my_cfg.dataset_path = args.dataset_path
-    my_cfg.preprocess_path = args.preprocess_path
-    my_cfg.window_size = args.window_size
-    my_cfg.window_step = args.window_step
-    my_cfg.exclude_file_head = args.exclude_file_head
+    cfg = config
+    cfg.dataset_path = args.dataset_path
+    cfg.preprocess_path = args.preprocess_path
+    cfg.window_size = args.window_size
+    cfg.window_step = args.window_step
+    cfg.exclude_file_head = args.exclude_file_head
 
-    preprocess(my_cfg)
+    preprocess()

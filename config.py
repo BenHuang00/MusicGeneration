@@ -5,6 +5,11 @@ import torch
 is_development = False
 
 
+# wandb settings
+wandb_project = 'MIR-Project-Test'
+wandb_key = ''
+wandb_entity = 'bugmakerh'
+
 # dataset settings
 dataset_path = 'datasets/DadaGP-v1.1' if not is_development else 'datasets/DadaGP-v1.1-dev'
 

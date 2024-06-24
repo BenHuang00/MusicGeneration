@@ -26,38 +26,39 @@ def preprocess_tokens2ids(tokens, tokens2ids_path, ids2tokens_path):
     return token2id, id2token
 
 
-def preprocess_dataset(metadata, tokens2ids):
+def preprocess_dataset(cfg, metadata, tokens2ids):
     split_data = []
     not_found_list = []
     for key, value in tqdm(metadata.items(), desc='Preprocessing dataset'):
-        token_path = os.path.join(args.dataset_path, value['tokens.txt'])
+        token_path = os.path.join(cfg.dataset_path, value['tokens.txt'])
         try:
             tokens = load_file(token_path).split()
-            if not args.exclude_file_head:
+            if not cfg.exclude_file_head:
                 tokens = tokens[:-1]
             else:
                 tokens = tokens[4:-1]
-            for i in range(0, len(tokens) - args.window_size, args.window_step):
-                window = tokens[i:i + args.window_size]
+            for i in range(0, len(tokens) - cfg.window_size, cfg.window_step):
+                window = tokens[i:i + cfg.window_size]
                 window_ids = [tokens2ids[token] for token in window]
-                target = tokens[i + args.window_size]
+                target = tokens[i + cfg.window_size]
                 target_id = tokens2ids[target]
                 split_data.append((window_ids, target_id))
         except FileNotFoundError:
             not_found_list.append(token_path)
     print(f'Not found: {not_found_list}')
     print(f'Preprocessed dataset: {len(split_data)} windows')
-    dataset = GPDataset(split_data)
-    save_file(dataset, os.path.join(args.preprocess_path, config.preprocess_dataset_name))
+    num_tokens = len(tokens2ids)
+    dataset = GPDataset(split_data, num_tokens)
+    save_file(dataset, os.path.join(cfg.preprocess_path, cfg.preprocess_dataset_name))
     print(f'Saved dataset: {len(dataset)} windows')
 
 
-def preprocess():
-    dataset_all_metadata_path = os.path.join(args.dataset_path, config.dataset_all_metadata_name)
-    dataset_all_tokens_path = os.path.join(args.dataset_path, config.dataset_all_tokens_name)
+def preprocess(cfg):
+    dataset_all_metadata_path = os.path.join(cfg.dataset_path, cfg.dataset_all_metadata_name)
+    dataset_all_tokens_path = os.path.join(cfg.dataset_path, cfg.dataset_all_tokens_name)
 
-    tokens2ids_path = os.path.join(args.preprocess_path, config.tokens2ids_name)
-    ids2tokens_path = os.path.join(args.preprocess_path, config.ids2tokens_name)
+    tokens2ids_path = os.path.join(cfg.preprocess_path, cfg.tokens2ids_name)
+    ids2tokens_path = os.path.join(cfg.preprocess_path, cfg.ids2tokens_name)
 
     print('Preprocessing dataset...')
 
@@ -70,7 +71,7 @@ def preprocess():
     tokens2ids, ids2tokens = preprocess_tokens2ids(tokens, tokens2ids_path, ids2tokens_path)
 
     print('Preprocessing dataset...')
-    preprocess_dataset(metadata, tokens2ids)
+    preprocess_dataset(cfg, metadata, tokens2ids)
 
 
 if __name__ == '__main__':
@@ -88,4 +89,11 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    preprocess()
+    my_cfg = config
+    my_cfg.dataset_path = args.dataset_path
+    my_cfg.preprocess_path = args.preprocess_path
+    my_cfg.window_size = args.window_size
+    my_cfg.window_step = args.window_step
+    my_cfg.exclude_file_head = args.exclude_file_head
+
+    preprocess(my_cfg)

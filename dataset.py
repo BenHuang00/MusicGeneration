@@ -3,8 +3,9 @@ from torch.utils.data import Dataset
 
 
 class GPDataset(Dataset):
-    def __init__(self, data):
+    def __init__(self, data, num_tokens):
         self.data = data
+        self.num_tokens = num_tokens
 
     def __len__(self):
         return len(self.data)

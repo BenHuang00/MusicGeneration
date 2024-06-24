@@ -96,7 +96,7 @@ def test_model(model, test_loader):
 
 
 def train():
-    wandb.login(key="")
+    wandb.login()
     wandb.init(project='MIR-Project-Test')
 
     dataset = load_file(os.path.join(cfg.preprocess_path, cfg.preprocess_dataset_name))

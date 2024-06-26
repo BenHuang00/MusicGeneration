@@ -1,8 +1,11 @@
 import os
+import sys
 import argparse
 import yaml
 
 from tqdm import tqdm
+
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 from utils import load_file, save_file
 

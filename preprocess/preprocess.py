@@ -89,12 +89,17 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Preprocess dataset')
 
-    parser.add_argument('--dataset_path', type=str, default=default_config['INFERENCE']['dataset_path'], help='Path to the dataset')
-    parser.add_argument('--preprocess_path', type=str, default=default_config['INFERENCE']['preprocess_path'], help='Path to save the preprocessed dataset')
+    parser.add_argument('--dataset_path', type=str, default=default_config['INFERENCE']['dataset_path'],
+                        help='Path to the dataset')
+    parser.add_argument('--preprocess_path', type=str, default=default_config['INFERENCE']['preprocess_path'],
+                        help='Path to save the preprocessed dataset')
 
-    parser.add_argument('--window_size', type=int, default=default_config['PREPROCESS']['window_size'], help='Size of the window')
-    parser.add_argument('--window_step', type=int, default=default_config['PREPROCESS']['window_step'], help='Step of the window')
-    parser.add_argument('--exclude_header', action='store_true', default=default_config['PREPROCESS']['exclude_header'], help='Exclude header of the file')
+    parser.add_argument('--window_size', type=int, default=default_config['PREPROCESS']['window_size'],
+                        help='Size of the window')
+    parser.add_argument('--window_step', type=int, default=default_config['PREPROCESS']['window_step'],
+                        help='Step of the window')
+    parser.add_argument('--exclude_header', action='store_true', default=default_config['PREPROCESS']['exclude_header'],
+                        help='Exclude header of the file')
 
     cfg = parser.parse_args()
 

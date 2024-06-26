@@ -1,4 +1,5 @@
 import os
+import sys
 import argparse
 import yaml
 
@@ -12,6 +13,8 @@ from torch.utils.data import DataLoader
 import wandb
 from tqdm import tqdm
 import matplotlib.pyplot as plt
+
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 from utils.utils import load_file, save_file
 from models import *

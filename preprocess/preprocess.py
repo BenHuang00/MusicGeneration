@@ -4,7 +4,7 @@ import yaml
 
 from tqdm import tqdm
 
-from utils.utils import load_file, save_file
+from utils import load_file, save_file
 
 from dataset import GPDataset
 

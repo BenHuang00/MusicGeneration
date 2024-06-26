@@ -1,0 +1,14 @@
+INFERENCE:
+  preprocess_path: ./datasets/DadaGP-v1.1-preprocessed
+  model_config_path: ./models/config.yaml
+  output_path: ./output
+
+TRAIN:
+  model: LSTM
+
+  train_scale: 0.8
+  val_scale: 0.1
+  batch_size: 128
+
+  epochs: 3
+  lr: 0.0001

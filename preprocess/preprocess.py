@@ -1,10 +1,10 @@
 import os
 import argparse
+import yaml
 
 from tqdm import tqdm
 
-import config
-from utils import load_file, save_file
+from utils.utils import load_file, save_file
 
 from dataset import GPDataset
 
@@ -33,7 +33,7 @@ def preprocess_dataset(metadata, tokens2ids):
         token_path = os.path.join(cfg.dataset_path, value['tokens.txt'])
         try:
             tokens = load_file(token_path).split()
-            if not cfg.exclude_file_head:
+            if not cfg.exclude_header:
                 tokens = tokens[:-1]
             else:
                 tokens = tokens[4:-1]
@@ -49,16 +49,16 @@ def preprocess_dataset(metadata, tokens2ids):
     print(f'Preprocessed dataset: {len(split_data)} windows')
     num_tokens = len(tokens2ids)
     dataset = GPDataset(split_data, num_tokens)
-    save_file(dataset, os.path.join(cfg.preprocess_path, cfg.preprocess_dataset_name))
+    save_file(dataset, os.path.join(cfg.preprocess_path, 'gpdataset.pkl'))
     print(f'Saved dataset: {len(dataset)} windows')
 
 
 def preprocess():
-    dataset_all_metadata_path = os.path.join(cfg.dataset_path, cfg.dataset_all_metadata_name)
-    dataset_all_tokens_path = os.path.join(cfg.dataset_path, cfg.dataset_all_tokens_name)
+    dataset_all_metadata_path = os.path.join(cfg.dataset_path, '_DadaGP_all_metadata.json')
+    dataset_all_tokens_path = os.path.join(cfg.dataset_path, '_DadaGP_all_tokens.json')
 
-    tokens2ids_path = os.path.join(cfg.preprocess_path, cfg.tokens2ids_name)
-    ids2tokens_path = os.path.join(cfg.preprocess_path, cfg.ids2tokens_name)
+    tokens2ids_path = os.path.join(cfg.preprocess_path, 'tokens2ids.json')
+    ids2tokens_path = os.path.join(cfg.preprocess_path, 'ids2tokens.json')
 
     print('Preprocessing dataset...')
 
@@ -74,26 +74,27 @@ def preprocess():
     preprocess_dataset(metadata, tokens2ids)
 
 
+def check_config():
+    assert os.path.exists(cfg.dataset_path), f'Not found: {cfg.dataset_path}'
+    assert cfg.window_size > 0, f'Invalid window size: {cfg.window_size}'
+    assert cfg.window_step > 0, f'Invalid window step: {cfg.window_step}'
+    print('Config checked')
+
+
 if __name__ == '__main__':
+    default_config = yaml.full_load(open('preprocess/config.yaml', 'r'))
+
     parser = argparse.ArgumentParser(description='Preprocess dataset')
 
-    parser.add_argument('--dataset_path', type=str, default=config.dataset_path, help='Path to the dataset')
-    parser.add_argument('--preprocess_path', type=str, default=config.preprocess_path,
-                        help='Path to save the preprocessed files')
+    parser.add_argument('--dataset_path', type=str, default=default_config['INFERENCE']['dataset_path'], help='Path to the dataset')
+    parser.add_argument('--preprocess_path', type=str, default=default_config['INFERENCE']['preprocess_path'], help='Path to save the preprocessed dataset')
 
-    parser.add_argument('--window_size', type=int, default=config.window_size, help='Size of the window')
-    parser.add_argument('--window_step', type=int, default=config.window_step, help='Step of the window')
+    parser.add_argument('--window_size', type=int, default=default_config['PREPROCESS']['window_size'], help='Size of the window')
+    parser.add_argument('--window_step', type=int, default=default_config['PREPROCESS']['window_step'], help='Step of the window')
+    parser.add_argument('--exclude_header', action='store_true', default=default_config['PREPROCESS']['exclude_header'], help='Exclude header of the file')
 
-    parser.add_argument('--exclude_file_head', action='store_true', default=config.exclude_file_head,
-                        help='Exclude the file head')
+    cfg = parser.parse_args()
 
-    args = parser.parse_args()
-
-    cfg = config
-    cfg.dataset_path = args.dataset_path
-    cfg.preprocess_path = args.preprocess_path
-    cfg.window_size = args.window_size
-    cfg.window_step = args.window_step
-    cfg.exclude_file_head = args.exclude_file_head
+    check_config()
 
     preprocess()

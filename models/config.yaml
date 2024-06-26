@@ -1,0 +1,6 @@
+LSTM:
+  embedding_size: 256
+  hidden_size: 512
+  num_layers: 2
+  bidirectional: True
+  dropout: 0.5

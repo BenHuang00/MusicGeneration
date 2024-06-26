@@ -1,1 +1,1 @@
-from .lstm import LSTM_Model
+from .LSTM import LSTM

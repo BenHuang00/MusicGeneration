@@ -6,6 +6,7 @@ tmp*
 dev*
 test*
 
-train_log*
+output
 
-wandb/
+wandb
+wandb_config.yaml

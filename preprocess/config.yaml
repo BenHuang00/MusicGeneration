@@ -1,0 +1,8 @@
+INFERENCE:
+  dataset_path: ./datasets/DadaGP-v1.1
+  preprocess_path: ./datasets/DadaGP-v1.1-preprocessed
+
+PREPROCESS:
+  window_size: 150
+  window_step: 150
+  exclude_header: False

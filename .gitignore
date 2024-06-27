@@ -6,7 +6,7 @@ tmp*
 dev*
 test*
 
-output
+output*
 
 wandb
 wandb_config.yaml

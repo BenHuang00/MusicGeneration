@@ -1,0 +1,9 @@
+INFERENCE:
+  model_path: ./output/models/LSTM_model-3-full.pth
+  output_path: ./output/music
+  tokens2ids_path: ./datasets/DadaGP-v1.1-preprocessed-dev/tokens2ids.json
+  ids2tokens_path: ./datasets/DadaGP-v1.1-preprocessed-dev/ids2tokens.json
+  prompt_path: ./datasets/DadaGP-v1.1/1/1 God/1 God - Grace.gp4.tokens.txt
+
+GENERATION:
+  max_length: 200

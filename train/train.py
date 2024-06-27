@@ -33,8 +33,6 @@ def train_model(model, train_loader, val_loader):
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=cfg.lr)
 
-    wandb.watch(model, criterion, log="all", log_freq=10)
-
     history = {'train_loss': [], 'val_loss': []}
 
     print(f'Start training {model.__class__.__name__} model')
@@ -66,7 +64,6 @@ def train_model(model, train_loader, val_loader):
         history['train_loss'].append(train_loss)
         history['val_loss'].append(val_loss)
 
-        wandb.log({"train_loss": train_loss, "val_loss": val_loss, 'epoch': epoch + 1})
         print(
             f'Epoch {epoch + 1}/{cfg.epochs}({datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}) - Train Loss: {train_loss:.4f} - Val Loss: {val_loss:.4f}')
 
@@ -74,10 +71,15 @@ def train_model(model, train_loader, val_loader):
                    os.path.join(f'{cfg.output_path}/models',
                                 f'{model.__class__.__name__}_model-{epoch + 1}.pth')
                    )
+        torch.save(model,
+                   os.path.join(f'{cfg.output_path}/models', f'{model.__class__.__name__}_model-{epoch + 1}-full.pth')
+                   )
         save_file(history,
                   os.path.join(f'{cfg.output_path}/history',
                                f'{model.__class__.__name__}_history-{epoch + 1}.json')
                   )
+
+        wandb.log({"train_loss": train_loss, "val_loss": val_loss, 'epoch': epoch + 1})
 
     draw_loss_curve(history, model.__class__.__name__)
 

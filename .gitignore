@@ -1,8 +1,12 @@
 .idea
 
 datasets
-preprocess
 
 tmp*
 dev*
 test*
+
+output
+
+wandb
+wandb_config.yaml

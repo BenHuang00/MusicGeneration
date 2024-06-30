@@ -41,14 +41,14 @@ class TransformerXL(MemTransformerLM):
     def reset_mems(self):
         self.mems = tuple()
 
-    def forward(self, data, target, *mems):
+    def forward(self, data, *mems):
         # nn.DataParallel does not allow size(0) tensors to be broadcasted.
         # So, have to initialize size(0) mems inside the model forward.
         # Moreover, have to return new_mems to allow nn.DataParallel to piece
         # them together.
         if not mems: mems = self.init_mems()
 
-        tgt_len = target.size(0)
+        tgt_len = data.size(0)
         hidden, new_mems = self._forward(data, mems=mems)
 
         pred_hid = hidden[-tgt_len:]

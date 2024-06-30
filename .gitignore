@@ -10,3 +10,5 @@ output*
 
 wandb
 wandb_config.yaml
+
+__pycache__

@@ -1,6 +1,7 @@
 import torch
 from torch import nn
 
+import transformerxl
 from transformerxl.pytorch.mem_transformer import (MemTransformerLM, RelPartialLearnableDecoderLayer,
                                                           RelLearnableDecoderLayer, DecoderLayer, AdaptiveEmbedding)
 from transformerxl.pytorch.utils.proj_adaptive_softmax import ProjectedAdaptiveLogSoftmax

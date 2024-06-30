@@ -6,6 +6,8 @@ from torch import nn
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
+print(sys.path)
+
 from models.transformerxl.pytorch.mem_transformer import (MemTransformerLM, RelPartialLearnableDecoderLayer,
                                                           RelLearnableDecoderLayer, DecoderLayer, AdaptiveEmbedding)
 from models.transformerxl.pytorch.utils.proj_adaptive_softmax import ProjectedAdaptiveLogSoftmax

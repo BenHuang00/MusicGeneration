@@ -1,10 +1,10 @@
 INFERENCE:
-  preprocess_path: ./datasets/DadaGP-v1.1-preprocessed
+  preprocess_path: ./datasets/DadaGP-v1.1-preprocessed-dev
   model_config_path: ./models/config.yaml
   output_path: ./output
 
 TRAIN:
-  model: LSTM
+  model: TransformerXL
 
   train_scale: 0.8
   val_scale: 0.1

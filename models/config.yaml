@@ -20,6 +20,7 @@ TransformerXL:
   d_head: 1024
   d_inner: 4096
   dropout: 0.1
+  dropatt: 0.0
   tie_weight: True
   d_embed: 512
   div_val: 1

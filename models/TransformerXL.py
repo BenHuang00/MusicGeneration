@@ -4,10 +4,10 @@ import sys
 import torch
 from torch import nn
 
-from transformerxl.pytorch.mem_transformer import (MemTransformerLM, RelPartialLearnableDecoderLayer,
+from .transformerxl.pytorch.mem_transformer import (MemTransformerLM, RelPartialLearnableDecoderLayer,
                                                           RelLearnableDecoderLayer, DecoderLayer, AdaptiveEmbedding)
-from transformerxl.pytorch.utils.proj_adaptive_softmax import ProjectedAdaptiveLogSoftmax
-from transformerxl.pytorch.utils.log_uniform_sampler import LogUniformSampler
+from .transformerxl.pytorch.utils.proj_adaptive_softmax import ProjectedAdaptiveLogSoftmax
+from .transformerxl.pytorch.utils.log_uniform_sampler import LogUniformSampler
 
 
 class TransformerXL(MemTransformerLM):

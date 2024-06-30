@@ -12,86 +12,30 @@ from .transformerxl.pytorch.utils.log_uniform_sampler import LogUniformSampler
 
 class TransformerXL(MemTransformerLM):
     def __init__(self, config):
-        super(TransformerXL, self).__init__()
+        super().__init__(
+            n_token=config['num_tokens'],
+            n_layer=config['n_layer'],
+            n_head=config['n_head'],
+            d_model=config['d_model'],
+            d_head=config['d_head'] // config['n_head'],
+            d_inner=config['d_inner'],
+            dropout=config['dropout'],
+            dropatt=config['dropatt'],
+            tie_weight=config['tie_weight'],
+            d_embed=config['d_embed'],
+            div_val=config['div_val'],
+            tie_projs=config['tie_projs'],
+            pre_lnorm=config['pre_lnorm'],
+            tgt_len=config['tgt_len'],
+            ext_len=config['ext_len'],
+            mem_len=config['mem_len'],
+            cutoffs=[],
+            same_length=config['same_length'],
+            attn_type=0,
+            clamp_len=-1,
+            sample_softmax=-1,
+        )
 
-        self.n_token = config['num_tokens']
-
-        self.n_layer = config['n_layer']
-        self.n_head = config['n_head']
-        self.d_model = config['d_model']
-        self.d_head = config['d_head']
-        self.d_inner = config['d_inner']
-        self.dropout = config['dropout']
-        self.dropatt = config['dropatt']
-        self.tie_weight = config['tie_weight']
-        self.d_embed = config['d_embed']
-        self.div_val = config['div_val']
-        self.tie_projs = config['tie_projs']
-        self.pre_lnorm = config['pre_lnorm']
-        self.tgt_len = config['tgt_len']
-        self.ext_len = config['ext_len']
-        self.mem_len = config['mem_len']
-        self.cutoffs = config['cutoffs']
-        self.adapt_inp = config['adapt_inp']
-        self.same_length = config['same_length']
-        self.attn_type = config['attn_type']
-        self.clamp_len = config['clamp_len']
-        self.sample_softmax = config['sample_softmax']
-
-        self.layers = nn.ModuleList()
-        if self.attn_type == 0:  # the default attention
-            for i in range(self.n_layer):
-                self.layers.append(
-                    RelPartialLearnableDecoderLayer(
-                        self.n_head, self.d_model, self.d_head, self.d_inner, self.dropout,
-                        tgt_len=self.tgt_len, ext_len=self.ext_len, mem_len=self.mem_len,
-                        dropatt=self.dropatt, pre_lnorm=self.pre_lnorm)
-                )
-        elif self.attn_type == 1:  # learnable embeddings
-            for i in range(self.n_layer):
-                self.layers.append(
-                    RelLearnableDecoderLayer(
-                        self.n_head, self.d_model, self.d_head, self.d_inner, self.dropout,
-                        tgt_len=self.tgt_len, ext_len=self.ext_len, mem_len=self.mem_len,
-                        dropatt=self.dropatt, pre_lnorm=self.pre_lnorm)
-                )
-        elif self.attn_type in [2, 3]:  # absolute embeddings
-            for i in range(self.n_layer):
-                self.layers.append(
-                    DecoderLayer(
-                        self.n_head, self.d_model, self.d_head, self.d_inner, self.dropout,
-                        dropatt=self.dropatt, pre_lnorm=self.pre_lnorm)
-                )
-
-        self.sample_softmax = self.sample_softmax
-        # use sampled softmax
-        if self.sample_softmax > 0:
-            self.out_layer = nn.Linear(self.d_model, self.n_token)
-            if self.tie_weight:
-                self.out_layer.weight = self.word_emb.weight
-            self.tie_weight = self.tie_weight
-            self.sampler = LogUniformSampler(self.n_token, self.sample_softmax)
-
-        # use adaptive softmax (including standard softmax)
-        else:
-            self.crit = ProjectedAdaptiveLogSoftmax(self.n_token, self.d_embed, self.d_model,
-                                                    self.cutoffs, div_val=self.div_val)
-
-            if self.tie_weight:
-                for i in range(len(self.crit.out_layers)):
-                    self.crit.out_layers[i].weight = self.word_emb.emb_layers[i].weight
-
-            if self.tie_projs:
-                for i, tie_proj in enumerate(self.tie_projs):
-                    if tie_proj and self.div_val == 1 and self.d_model != self.d_embed:
-                        self.crit.out_projs[i] = self.word_emb.emb_projs[0]
-                    elif tie_proj and self.div_val != 1:
-                        self.crit.out_projs[i] = self.word_emb.emb_projs[i]
-
-        self.same_length = self.same_length
-        self.clamp_len = self.clamp_len
-
-        self._create_params()
         self.mems = tuple()
 
     def reset_mems(self):

@@ -1,10 +1,10 @@
 import torch
 from torch import nn
 
-from models.transformerxl.pytorch.mem_transformer import (MemTransformerLM, RelPartialLearnableDecoderLayer,
-                                                   RelLearnableDecoderLayer, DecoderLayer, AdaptiveEmbedding)
-from models.transformerxl.pytorch.utils.proj_adaptive_softmax import ProjectedAdaptiveLogSoftmax
-from models.transformerxl.pytorch.utils.log_uniform_sampler import LogUniformSampler
+from transformerxl.pytorch.mem_transformer import (MemTransformerLM, RelPartialLearnableDecoderLayer,
+                                                          RelLearnableDecoderLayer, DecoderLayer, AdaptiveEmbedding)
+from transformerxl.pytorch.utils.proj_adaptive_softmax import ProjectedAdaptiveLogSoftmax
+from transformerxl.pytorch.utils.log_uniform_sampler import LogUniformSampler
 
 
 class TransformerXL(MemTransformerLM):
@@ -109,4 +109,4 @@ class TransformerXL(MemTransformerLM):
         if new_mems is not None:
             self.mems = new_mems
 
-        return pred_hid[:,-1,:]
+        return pred_hid[:, -1, :]

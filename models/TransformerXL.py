@@ -3,11 +3,14 @@ import sys
 
 import torch
 from torch import nn
+from typing import TypeVar
 
 from .transformerxl.pytorch.mem_transformer import (MemTransformerLM, RelPartialLearnableDecoderLayer,
                                                           RelLearnableDecoderLayer, DecoderLayer, AdaptiveEmbedding)
 from .transformerxl.pytorch.utils.proj_adaptive_softmax import ProjectedAdaptiveLogSoftmax
 from .transformerxl.pytorch.utils.log_uniform_sampler import LogUniformSampler
+
+T = TypeVar('T', bound='Module')
 
 
 class TransformerXL(MemTransformerLM):
@@ -38,6 +41,31 @@ class TransformerXL(MemTransformerLM):
 
         self.mems = tuple()
 
+        self.linear_proj = nn.Linear(self.d_model, self.n_token)
+
+    def train(self: T, mode: bool = True) -> T:
+        r"""Set the module in training mode.
+
+        This has any effect only on certain modules. See documentations of
+        particular modules for details of their behaviors in training/evaluation
+        mode, if they are affected, e.g. :class:`Dropout`, :class:`BatchNorm`,
+        etc.
+
+        Args:
+            mode (bool): whether to set training mode (``True``) or evaluation
+                         mode (``False``). Default: ``True``.
+
+        Returns:
+            Module: self
+        """
+        if not isinstance(mode, bool):
+            raise ValueError("training mode is expected to be boolean")
+        self.training = mode
+        for module in self.children():
+            module.train(mode)
+        self.reset_mems()   # Clear memory
+        return self
+
     def reset_mems(self):
         self.mems = tuple()
 
@@ -52,8 +80,10 @@ class TransformerXL(MemTransformerLM):
         hidden, new_mems = self._forward(data, mems=mems)
 
         pred_hid = hidden[-tgt_len:]
+        predict = self.linear_proj(pred_hid)
+        predict = predict[:, -1, :]
 
         if new_mems is not None:
             self.mems = new_mems
 
-        return pred_hid[:, -1, :]
+        return predict

@@ -78,6 +78,25 @@ class TransformerXL(MemTransformerLM):
         self.reset_mems()   # Clear memory
         return self
 
+    def eval(self: T) -> T:
+        r"""Set the module in evaluation mode.
+
+        This has any effect only on certain modules. See documentations of
+        particular modules for details of their behaviors in training/evaluation
+        mode, if they are affected, e.g. :class:`Dropout`, :class:`BatchNorm`,
+        etc.
+
+        This is equivalent with :meth:`self.train(False) <torch.nn.Module.train>`.
+
+        See :ref:`locally-disable-grad-doc` for a comparison between
+        `.eval()` and several similar mechanisms that may be confused with it.
+
+        Returns:
+            Module: self
+        """
+        self.reset_mems()  # Clear memory
+        return self.train(False)
+
     def reset_mems(self):
         self.mems = tuple()
 

@@ -1,5 +1,6 @@
 import os
 import sys
+import math
 
 import torch
 from torch import nn
@@ -11,6 +12,16 @@ from .transformerxl.pytorch.utils.proj_adaptive_softmax import ProjectedAdaptive
 from .transformerxl.pytorch.utils.log_uniform_sampler import LogUniformSampler
 
 T = TypeVar('T', bound='Module')
+
+
+class Embeddings(nn.Module):
+    def __init__(self, n_token, d_model):
+        super(Embeddings, self).__init__()
+        self.lut = nn.Embedding(n_token, d_model)
+        self.d_model = d_model
+
+    def forward(self, x):
+        return self.lut(x) * math.sqrt(self.d_model)
 
 
 class TransformerXL(MemTransformerLM):
@@ -41,6 +52,7 @@ class TransformerXL(MemTransformerLM):
 
         self.mems = tuple()
 
+        self.word_emb = Embeddings(self.n_token, self.d_model)
         self.linear_proj = nn.Linear(self.d_model, self.n_token)
 
     def train(self: T, mode: bool = True) -> T:

@@ -1,15 +1,10 @@
-import os
-import sys
 import math
 
 import torch
 from torch import nn
 from typing import TypeVar
 
-from .transformerxl.pytorch.mem_transformer import (MemTransformerLM, RelPartialLearnableDecoderLayer,
-                                                          RelLearnableDecoderLayer, DecoderLayer, AdaptiveEmbedding)
-from .transformerxl.pytorch.utils.proj_adaptive_softmax import ProjectedAdaptiveLogSoftmax
-from .transformerxl.pytorch.utils.log_uniform_sampler import LogUniformSampler
+from .transformerxl.pytorch.mem_transformer import MemTransformerLM
 
 T = TypeVar('T', bound='Module')
 
@@ -56,20 +51,6 @@ class TransformerXL(MemTransformerLM):
         self.linear_proj = nn.Linear(self.d_model, self.n_token)
 
     def train(self: T, mode: bool = True) -> T:
-        r"""Set the module in training mode.
-
-        This has any effect only on certain modules. See documentations of
-        particular modules for details of their behaviors in training/evaluation
-        mode, if they are affected, e.g. :class:`Dropout`, :class:`BatchNorm`,
-        etc.
-
-        Args:
-            mode (bool): whether to set training mode (``True``) or evaluation
-                         mode (``False``). Default: ``True``.
-
-        Returns:
-            Module: self
-        """
         if not isinstance(mode, bool):
             raise ValueError("training mode is expected to be boolean")
         self.training = mode
@@ -79,26 +60,11 @@ class TransformerXL(MemTransformerLM):
         return self
 
     def eval(self: T) -> T:
-        r"""Set the module in evaluation mode.
-
-        This has any effect only on certain modules. See documentations of
-        particular modules for details of their behaviors in training/evaluation
-        mode, if they are affected, e.g. :class:`Dropout`, :class:`BatchNorm`,
-        etc.
-
-        This is equivalent with :meth:`self.train(False) <torch.nn.Module.train>`.
-
-        See :ref:`locally-disable-grad-doc` for a comparison between
-        `.eval()` and several similar mechanisms that may be confused with it.
-
-        Returns:
-            Module: self
-        """
         self.reset_mems()  # Clear memory
         return self.train(False)
 
     def reset_mems(self):
-        self.mems = None
+        self.mems = tuple()
 
     def forward(self, data, *mems):
         # nn.DataParallel does not allow size(0) tensors to be broadcasted.

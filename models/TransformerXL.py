@@ -98,7 +98,7 @@ class TransformerXL(MemTransformerLM):
         return self.train(False)
 
     def reset_mems(self):
-        self.mems = tuple()
+        self.mems = None
 
     def forward(self, data, *mems):
         # nn.DataParallel does not allow size(0) tensors to be broadcasted.

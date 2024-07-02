@@ -12,3 +12,5 @@ wandb
 wandb_config.yaml
 
 __pycache__
+
+config.yaml

@@ -5,7 +5,7 @@ from torch import nn
 class LSTM(nn.Module):
     def __init__(self, config):
         super(LSTM, self).__init__()
-        print('LSTM config:', config)
+
         self.num_tokens = config['num_tokens']
         self.embedding_size = config['embedding_size']
         self.hidden_size = config['hidden_size']

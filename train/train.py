@@ -124,8 +124,9 @@ def train():
     os.makedirs(os.path.join(cfg.output_path, 'history'), exist_ok=True)
     os.makedirs(os.path.join(cfg.output_path, 'figures'), exist_ok=True)
 
-    model_config[cfg.model]['num_tokens'] = num_tokens
-    model = eval(cfg.model)(model_config[cfg.model]).to(cfg.device)
+    model_config = model_cfg[cfg.model]
+    model_config['num_tokens'] = num_tokens
+    model = eval(cfg.model)(model_config).to(cfg.device)
 
     train_model(model, train_loader, val_loader)
     test_model(model, test_loader)
@@ -134,7 +135,7 @@ def train():
 
 
 def check_config():
-    assert cfg.model in model_config, f'Unsupported model: {cfg.model}'
+    assert cfg.model in model_cfg, f'Unsupported model: {cfg.model}'
     assert os.path.exists(cfg.preprocess_path), f'Not found: {cfg.preprocess_path}'
     assert 0 < cfg.train_scale < 1, f'Invalid train_scale: {cfg.train_scale}'
     assert 0 < cfg.val_scale < 1, f'Invalid val_scale: {cfg.val_scale}'
@@ -163,17 +164,17 @@ if __name__ == '__main__':
     parser.add_argument('--epochs', type=int, default=default_config['TRAIN']['epochs'], help='Number of epochs')
     parser.add_argument('--lr', type=float, default=default_config['TRAIN']['lr'], help='Learning rate')
 
+    parser.add_argument('--device', type=str, default='cuda' if torch.cuda.is_available() else 'cpu', help='Device')
+
     wandb_config = yaml.full_load(open('wandb_config.yaml', 'r'))
 
     parser.add_argument('--wandb_project', type=str, default=wandb_config['WANDB']['wandb_project'], help='Wandb project name')
     parser.add_argument('--wandb_entity', type=str, default=wandb_config['WANDB']['wandb_entity'], help='Wandb entity name')
     parser.add_argument('--wandb_key', type=str, default=wandb_config['WANDB']['wandb_key'], help='Wandb key')
 
-    parser.add_argument('--device', type=str, default='cuda' if torch.cuda.is_available() else 'cpu', help='Device')
-
     cfg = parser.parse_args()
 
-    model_config = yaml.full_load(open('models/config.yaml', 'r'))
+    model_cfg = yaml.full_load(open('models/config.yaml', 'r'))
 
     check_config()
 

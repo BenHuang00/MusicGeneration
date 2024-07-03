@@ -1,8 +1,8 @@
 from torch import nn
-from mamba_ssm import Mamba
+from mamba_ssm import Mamba as Mamba_ssm
 
 
-class GPMamba(nn.Module):
+class Mamba(nn.Module):
     def __init__(self, config):
         super().__init__()
 
@@ -14,7 +14,7 @@ class GPMamba(nn.Module):
         self.expand = config['expand']
 
         self.embedding = nn.Embedding(num_tokens, self.d_model)
-        self.mamba = Mamba(self.d_model, self.d_state, self.d_conv, self.expand)
+        self.mamba = Mamba_ssm(self.d_model, self.d_state, self.d_conv, self.expand)
         self.head = nn.Linear(self.d_model, num_tokens)
 
     def forward(self, x):

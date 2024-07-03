@@ -127,7 +127,7 @@ def train():
     model_config = model_cfg[cfg.model]
     model_config['num_tokens'] = num_tokens
 
-    wandb.config.update(cfg)
+    wandb.config.update(model_config)
 
     model = eval(cfg.model)(model_config)
     model.to(cfg.device)

@@ -129,7 +129,8 @@ def train():
 
     wandb.config.update(cfg)
 
-    model = eval(cfg.model)(model_config).to(cfg.device)
+    model = eval(cfg.model)(model_config)
+    model.to(cfg.device)
 
     train_model(model, train_loader, val_loader)
     test_model(model, test_loader)

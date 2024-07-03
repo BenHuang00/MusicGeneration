@@ -35,3 +35,9 @@ TransformerXL:
   attn_type: 0
   clamp_len: -1
   sample_softmax: -1
+
+Mamba:
+  d_model: 128
+  d_state: 64
+  d_conv: 8
+  expand: 2

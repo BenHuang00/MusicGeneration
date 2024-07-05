@@ -30,6 +30,8 @@ def draw_loss_curve(history, model_name):
 
 
 def train_model(model, train_loader, val_loader):
+    wandb.init(project=cfg.wandb_project, entity=cfg.wandb_entity)
+
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=cfg.lr)
 
@@ -102,7 +104,6 @@ def test_model(model, test_loader):
 
 def train():
     wandb.login()
-    wandb.init(project=cfg.wandb_project, entity=cfg.wandb_entity)
 
     dataset = load_file(os.path.join(cfg.preprocess_path, 'gpdataset.pkl'))
     print(f'Loaded dataset: {len(dataset)} windows')

@@ -10,7 +10,7 @@ output*
 
 wandb
 wandb_config.yaml
+config.yaml
+config_sweep.yaml
 
 __pycache__
-
-config.yaml

@@ -165,7 +165,7 @@ def main():
         print(f'Start training {cfg.model} model with Optuna')
         os.makedirs(os.path.join(cfg.output_path, 'optuna'), exist_ok=True)
         study = optuna.create_study(study_name=f'MIR-Project-{cfg.model}', direction='minimize')
-        study.optimize(lambda trial: optuna_objective(trial, train_loader, val_loader, test_loader), n_trials=3)
+        study.optimize(lambda trial: optuna_objective(trial, train_loader, val_loader, test_loader), n_trials=50)
         save_file(study.best_params, os.path.join(f'{cfg.output_path}/optuna', f'{cfg.model}_best_params.json'))
         save_file(study, os.path.join(f'{cfg.output_path}/optuna', f'{cfg.model}_study.pkl'))
 

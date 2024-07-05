@@ -103,7 +103,7 @@ def test_model(model, test_loader):
 
 
 def train(model_config, train_loader, val_loader, test_loader):
-    wandb.init(project=cfg.wandb_project, entity=cfg.wandb_entity, config=model_cfg)
+    wandb.init(project=cfg.wandb_project, entity=cfg.wandb_entity, config=model_config)
 
     model = eval(cfg.model)(model_config)
     model.to(cfg.device)

@@ -26,7 +26,7 @@ def generate_music(model, prompt, tokens2ids, ids2tokens):
         for i in tqdm(range(cfg.max_length), desc='Generating music'):
             inputs = torch.tensor(prompt_ids).unsqueeze(0).to(cfg.device)
             outputs = model(inputs)
-            prediction = torch.argmax(outputs, dim=-1)
+            prediction = torch.argmax(outputs, dim=-1)  # TODO: random selection from probability distribution of top k
             prompt_ids.append(prediction.item())
 
     music = [ids2tokens[str(id)] for id in prompt_ids]

@@ -1,0 +1,20 @@
+LSTM:
+  embedding_size:
+    TYPE: int
+    MIN: 128
+    MAX: 512
+  hidden_size:
+    TYPE: int
+    MIN: 256
+    MAX: 1024
+  num_layers:
+    TYPE: int
+    MIN: 1
+    MAX: 3
+  bidirectional:
+    TYPE: categorical
+    CHOICES: [True, False]
+  dropout:
+    TYPE: float
+    MIN: 0.1
+    MAX: 0.5

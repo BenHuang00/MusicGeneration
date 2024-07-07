@@ -11,6 +11,7 @@ from torch.utils.data import random_split
 from torch.utils.data import DataLoader
 
 import wandb
+import optuna
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 
@@ -98,11 +99,43 @@ def test_model(model, test_loader):
             test_loss += loss.item()
         test_loss /= len(test_loader)
         print(f'Test Loss: {test_loss:.4f}')
+        wandb.log({"test_loss": test_loss})
+    return test_loss
 
 
-def train():
-    wandb.login()
-    wandb.init(project=cfg.wandb_project, entity=cfg.wandb_entity)
+def train(model_config, train_loader, val_loader, test_loader):
+    wandb.init(project=cfg.wandb_project, entity=cfg.wandb_entity, config=model_config)
+
+    model = eval(cfg.model)(model_config)
+    model.to(cfg.device)
+
+    train_model(model, train_loader, val_loader)
+    test_loss = test_model(model, test_loader)
+
+    wandb.finish()
+
+    return test_loss
+
+
+def optuna_objective(trial, train_loader, val_loader, test_loader):
+    optuna_config = yaml.full_load(open('models/config_optuna.yaml', 'r'))
+    model_config = model_cfg[cfg.model]
+
+    for key, val in optuna_config[cfg.model].items():
+        if val['TYPE'] == 'int':
+            model_config[key] = trial.suggest_int(key, val['MIN'], val['MAX'])
+        elif val['TYPE'] == 'float':
+            model_config[key] = trial.suggest_float(key, val['MIN'], val['MAX'])
+        elif val['TYPE'] == 'categorical':
+            model_config[key] = trial.suggest_categorical(key, val['CHOICES'])
+
+    test_loss = train(model_config, train_loader, val_loader, test_loader)
+
+    return test_loss
+
+
+def main():
+    wandb.login(key=cfg.wandb_key)
 
     dataset = load_file(os.path.join(cfg.preprocess_path, 'gpdataset.pkl'))
     print(f'Loaded dataset: {len(dataset)} windows')
@@ -127,15 +160,15 @@ def train():
     model_config = model_cfg[cfg.model]
     model_config['num_tokens'] = num_tokens
 
-    wandb.config.update(model_config)
-
-    model = eval(cfg.model)(model_config)
-    model.to(cfg.device)
-
-    train_model(model, train_loader, val_loader)
-    test_model(model, test_loader)
-
-    wandb.finish()
+    if not cfg.optuna:
+        train(model_config, train_loader, val_loader, test_loader)
+    else:
+        print(f'Start training {cfg.model} model with Optuna')
+        os.makedirs(os.path.join(cfg.output_path, 'optuna'), exist_ok=True)
+        study = optuna.create_study(study_name=f'MIR-Project-{cfg.model}', direction='minimize')
+        study.optimize(lambda trial: optuna_objective(trial, train_loader, val_loader, test_loader), n_trials=50)
+        save_file(study.best_params, os.path.join(f'{cfg.output_path}/optuna', f'{cfg.model}_best_params.json'))
+        save_file(study, os.path.join(f'{cfg.output_path}/optuna', f'{cfg.model}_study.pkl'))
 
 
 def check_config():
@@ -156,8 +189,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Train model')
 
     parser.add_argument('--preprocess_path', type=str, default=default_config['INFERENCE']['preprocess_path'], help='Path to the preprocessed dataset')
-    parser.add_argument('--model_config_path', type=str, default=default_config['INFERENCE']['model_config_path'], help='Path to the model config')
     parser.add_argument('--output_path', type=str, default=default_config['INFERENCE']['output_path'], help='Path to the output directory')
+    parser.add_argument('--optuna', action='store_true', default=default_config['INFERENCE']['optuna'], help='Optuna hyperparameter optimization')
 
     parser.add_argument('--model', type=str, default=default_config['TRAIN']['model'], help='Model name')
 
@@ -182,4 +215,4 @@ if __name__ == '__main__':
 
     check_config()
 
-    train()
+    main()

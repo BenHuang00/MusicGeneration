@@ -99,6 +99,7 @@ def test_model(model, test_loader):
             test_loss += loss.item()
         test_loss /= len(test_loader)
         print(f'Test Loss: {test_loss:.4f}')
+        wandb.log({"test_loss": test_loss})
     return test_loss
 
 

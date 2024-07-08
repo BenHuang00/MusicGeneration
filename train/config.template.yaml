@@ -1,5 +1,5 @@
 INFERENCE:
-  preprocess_path: ./datasets/DadaGP-v1.1-preprocessed-dev
+  preprocess_path: ./datasets/DadaGP-v1.1-preprocessed
   output_path: ./output
   optuna: True
 
@@ -10,5 +10,5 @@ TRAIN:
   val_scale: 0.1
   batch_size: 128
 
-  epochs: 3
+  epochs: 50
   lr: 0.001

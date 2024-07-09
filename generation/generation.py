@@ -18,6 +18,27 @@ def load_model(model_path):
     return model
 
 
+def temperature(logits, temperature):
+    probs = torch.exp(logits / temperature) / torch.sum(torch.exp(logits / temperature))
+    return probs
+
+
+def nucleus(probs, p):
+    probs /= torch.sum(probs)
+    sorted_probs, sorted_index = torch.sort(probs, descending=True)
+    cusum_sorted_probs = torch.cumsum(sorted_probs, dim=0)
+    after_threshold = cusum_sorted_probs > p
+    if torch.sum(after_threshold) > 0:
+        last_index = torch.where(after_threshold)[0][0].item() + 1
+        candi_index = sorted_index[:last_index]
+    else:
+        candi_index = sorted_index[:3]  # just assign a value
+    candi_probs = probs[candi_index]
+    candi_probs /= torch.sum(candi_probs)
+    word = torch.multinomial(candi_probs, 1).item()
+    return candi_index[word].item()
+
+
 def generate_music(model, prompt, tokens2ids, ids2tokens):
     prompt_ids = [tokens2ids[token] for token in prompt]
 
@@ -26,8 +47,10 @@ def generate_music(model, prompt, tokens2ids, ids2tokens):
         for i in tqdm(range(cfg.max_length), desc='Generating music'):
             inputs = torch.tensor(prompt_ids).unsqueeze(0).to(cfg.device)
             outputs = model(inputs)
-            prediction = torch.argmax(outputs, dim=-1)  # TODO: random selection from probability distribution of top k
-            prompt_ids.append(prediction.item())
+            outputs = outputs.squeeze(0)
+            outputs = temperature(outputs, cfg.temperature)
+            predict = nucleus(outputs, 0.9)
+            prompt_ids.append(predict)
 
     music = [ids2tokens[str(id)] for id in prompt_ids]
     music = '\n'.join(music)
@@ -39,7 +62,9 @@ def generate():
     model = load_model(cfg.model_path)
     tokens2ids = load_file(cfg.tokens2ids_path)
     ids2tokens = load_file(cfg.ids2tokens_path)
-    prompt = load_file(cfg.prompt_path).split()[:-1]
+    prompt = load_file(cfg.prompt_path).split()
+    if prompt[-1] == 'end':
+        prompt = prompt[:-1]
     music = generate_music(model, prompt, tokens2ids, ids2tokens)
     save_file(music, os.path.join(cfg.output_path, 'generated.txt'))
 
@@ -56,6 +81,7 @@ if __name__ == '__main__':
     parser.add_argument('--prompt_path', type=str, default=default_config['INFERENCE']['prompt_path'], help='Path to the prompt file')
 
     parser.add_argument('--max_length', type=int, default=default_config['GENERATION']['max_length'], help='Max length of the generated music')
+    parser.add_argument('--temperature', type=float, default=default_config['GENERATION']['temperature'], help='Temperature for sampling')
 
     parser.add_argument('--device', type=str, default='cuda' if torch.cuda.is_available() else 'cpu', help='Device')
 

@@ -36,7 +36,7 @@ def nucleus(probs, p):
     candi_probs = probs[candi_index]
     candi_probs /= torch.sum(candi_probs)
     word = torch.multinomial(candi_probs, 1).item()
-    return candi_index[word].item()
+    return candi_index[word]
 
 
 def generate_music(model, prompt, tokens2ids, ids2tokens):
@@ -50,7 +50,8 @@ def generate_music(model, prompt, tokens2ids, ids2tokens):
             outputs = outputs.squeeze(0)
             outputs = temperature(outputs, cfg.temperature)
             predict = nucleus(outputs, cfg.nucleus)
-            prompt_ids.append(predict)
+            # predict = torch.argmax(outputs, dim=-1)
+            prompt_ids.append(predict.item())
 
     music = [ids2tokens[str(id)] for id in prompt_ids]
     music = '\n'.join(music)

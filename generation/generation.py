@@ -85,7 +85,12 @@ if __name__ == '__main__':
     parser.add_argument('--temperature', type=float, default=default_config['GENERATION']['temperature'], help='Temperature for sampling')
     parser.add_argument('--nucleus', type=float, default=default_config['GENERATION']['nucleus'], help='Nucleus for sampling')
 
-    parser.add_argument('--device', type=str, default='cuda' if torch.cuda.is_available() else 'cpu', help='Device')
+    device = 'cpu'
+    if torch.cuda.is_available():
+        device = 'cuda'
+    if torch.backends.mps.is_available():
+        device = 'mps'
+    parser.add_argument('--device', type=str, default=device, help='Device')
 
     cfg = parser.parse_args()
 

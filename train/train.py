@@ -201,7 +201,12 @@ if __name__ == '__main__':
     parser.add_argument('--epochs', type=int, default=default_config['TRAIN']['epochs'], help='Number of epochs')
     parser.add_argument('--lr', type=float, default=default_config['TRAIN']['lr'], help='Learning rate')
 
-    parser.add_argument('--device', type=str, default='cuda' if torch.cuda.is_available() else 'cpu', help='Device')
+    device = 'cpu'
+    if torch.cuda.is_available():
+        device = 'cuda'
+    if torch.backends.mps.is_available():
+        device = 'mps'
+    parser.add_argument('--device', type=str, default=device, help='Device')
 
     wandb_config = yaml.full_load(open('wandb_config.yaml', 'r'))
 

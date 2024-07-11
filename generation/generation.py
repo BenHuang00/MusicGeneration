@@ -49,7 +49,7 @@ def generate_music(model, prompt, tokens2ids, ids2tokens):
             outputs = model(inputs)
             outputs = outputs.squeeze(0)
             outputs = temperature(outputs, cfg.temperature)
-            predict = nucleus(outputs, 0.9)
+            predict = nucleus(outputs, cfg.nucleus)
             prompt_ids.append(predict)
 
     music = [ids2tokens[str(id)] for id in prompt_ids]
@@ -82,6 +82,7 @@ if __name__ == '__main__':
 
     parser.add_argument('--max_length', type=int, default=default_config['GENERATION']['max_length'], help='Max length of the generated music')
     parser.add_argument('--temperature', type=float, default=default_config['GENERATION']['temperature'], help='Temperature for sampling')
+    parser.add_argument('--nucleus', type=float, default=default_config['GENERATION']['nucleus'], help='Nucleus for sampling')
 
     parser.add_argument('--device', type=str, default='cuda' if torch.cuda.is_available() else 'cpu', help='Device')
 

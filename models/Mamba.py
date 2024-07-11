@@ -19,14 +19,12 @@ class Mamba(nn.Module):
         self.dropout1 = nn.Dropout(self.dropout)
         self.mamba = Mamba_ssm(self.d_model, self.d_state, self.d_conv, self.expand)
         self.dropout2 = nn.Dropout(self.dropout)
-        self.head = nn.Linear(self.d_model, num_tokens)
-        self.dropout3 = nn.Dropout(self.dropout)
+        self.fc = nn.Linear(self.d_model, num_tokens)
 
     def forward(self, x):
         x = self.embedding(x)
         x = self.dropout1(x)
         x = self.mamba(x)
         x = self.dropout2(x)
-        x = self.head(x)
-        x = self.dropout3(x)
-        return x[:, -1, :]
+        out = self.fc(x[:, -1, :])
+        return out[:, -1, :]

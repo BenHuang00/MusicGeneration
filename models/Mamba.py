@@ -27,4 +27,4 @@ class Mamba(nn.Module):
         x = self.mamba(x)
         x = self.dropout2(x)
         out = self.fc(x[:, -1, :])
-        return out[:, -1, :]
+        return out

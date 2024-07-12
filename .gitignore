@@ -17,4 +17,4 @@ config_optuna.yaml
 
 __pycache__
 
-prompt.txt
+prompt*.txt

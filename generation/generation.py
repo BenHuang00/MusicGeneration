@@ -19,6 +19,7 @@ def load_model(model_path):
 
 
 def temperature(logits, temperature):
+    # probs = torch.softmax(logits, dim=0)
     probs = torch.exp(logits / temperature) / torch.sum(torch.exp(logits / temperature))
     return probs
 
@@ -45,14 +46,15 @@ def generate_music(model, prompt, tokens2ids, ids2tokens):
     model.eval()
     with torch.no_grad():
         for i in tqdm(range(cfg.max_length), desc='Generating music'):
-            inputs = torch.tensor(prompt_ids).unsqueeze(0).to(cfg.device)
+            inputs = torch.tensor(prompt_ids, dtype=torch.long).unsqueeze(0).to(cfg.device)
             outputs = model(inputs)
             outputs = outputs.squeeze(0)
-            outputs = temperature(outputs, cfg.temperature)
-            predict = nucleus(outputs, cfg.nucleus)
-            # predict = torch.argmax(outputs, dim=-1)
+            # outputs = temperature(outputs, cfg.temperature)
+            # predict = nucleus(outputs, cfg.nucleus)
+            _, predict = torch.max(outputs, 0)
             prompt_ids.append(predict.item())
 
+    prompt_ids.append(tokens2ids['end'])
     music = [ids2tokens[str(id)] for id in prompt_ids]
     music = '\n'.join(music)
 

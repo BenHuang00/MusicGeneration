@@ -137,6 +137,7 @@ def optuna_objective(trial, train_loader, val_loader, test_loader):
 def main():
     wandb.login(key=cfg.wandb_key)
 
+    print(f'Start loading dataset from {cfg.preprocess_path}')
     dataset = load_file(os.path.join(cfg.preprocess_path, 'gpdataset.pkl'))
     print(f'Loaded dataset: {len(dataset)} windows')
 

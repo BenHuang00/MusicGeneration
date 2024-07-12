@@ -45,7 +45,7 @@ def train_model(model, train_loader, val_loader):
             inputs, targets = inputs.to(cfg.device), targets.to(cfg.device)
             optimizer.zero_grad()
             outputs = model(inputs)
-            loss = criterion(outputs, targets)
+            loss = criterion(outputs.view(-1, model.num_tokens), targets.view(-1))
             loss.backward()
             optimizer.step()
             train_loss += loss.item()
@@ -58,7 +58,7 @@ def train_model(model, train_loader, val_loader):
             for i, (inputs, targets) in tqdm(enumerate(val_loader), desc=f'Validation', total=len(val_loader)):
                 inputs, targets = inputs.to(cfg.device), targets.to(cfg.device)
                 outputs = model(inputs)
-                loss = criterion(outputs, targets)
+                loss = criterion(outputs.view(-1, model.num_tokens), targets.view(-1))
                 val_loss += loss.item()
         val_loss /= len(val_loader)
 
@@ -95,7 +95,7 @@ def test_model(model, test_loader):
         for i, (inputs, targets) in tqdm(enumerate(test_loader), desc=f'Testing', total=len(test_loader)):
             inputs, targets = inputs.to(cfg.device), targets.to(cfg.device)
             outputs = model(inputs)
-            loss = criterion(outputs, targets)
+            loss = criterion(outputs.view(-1, model.num_tokens), targets.view(-1))
             test_loss += loss.item()
         test_loss /= len(test_loader)
         print(f'Test Loss: {test_loss:.4f}')

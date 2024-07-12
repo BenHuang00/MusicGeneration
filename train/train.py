@@ -185,6 +185,8 @@ def check_config():
 
 
 if __name__ == '__main__':
+    print('Start training')
+
     default_config = yaml.full_load(open('train/config.yaml', 'r'))
 
     parser = argparse.ArgumentParser(description='Train model')

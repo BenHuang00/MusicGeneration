@@ -27,7 +27,7 @@ def draw_loss_curve(history, model_name):
     plt.xlabel('Epochs')
     plt.ylabel('Loss')
     plt.legend()
-    plt.savefig(os.path.join(f'{cfg.output_path}/figures', f'{model_name}_loss_curve.png'))
+    plt.savefig(os.path.join(f'{cfg.output_path}/figures', f'{model_name}-{wandb.run.id}_loss_curve.png'))
 
 
 def train_model(model, train_loader, val_loader):

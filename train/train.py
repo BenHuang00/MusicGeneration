@@ -71,14 +71,14 @@ def train_model(model, train_loader, val_loader):
 
         torch.save(model.state_dict(),
                    os.path.join(f'{cfg.output_path}/models',
-                                f'{model.__class__.__name__}_model-{epoch + 1}.pth')
+                                f'{model.__class__.__name__}_model-{wandb.run.id}-{epoch + 1}.pth')
                    )
         torch.save(model,
-                   os.path.join(f'{cfg.output_path}/models', f'{model.__class__.__name__}_model-{epoch + 1}-full.pth')
+                   os.path.join(f'{cfg.output_path}/models', f'{model.__class__.__name__}_model-{wandb.run.id}-{epoch + 1}-full.pth')
                    )
         save_file(history,
                   os.path.join(f'{cfg.output_path}/history',
-                               f'{model.__class__.__name__}_history-{epoch + 1}.json')
+                               f'{model.__class__.__name__}_history-{wandb.run.id}-{epoch + 1}.json')
                   )
 
         wandb.log({"train_loss": train_loss, "val_loss": val_loss, 'epoch': epoch + 1})

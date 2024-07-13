@@ -2,6 +2,7 @@ import os
 import sys
 import argparse
 import yaml
+from pathlib import Path
 
 from tqdm import tqdm
 
@@ -85,7 +86,9 @@ def check_config():
 if __name__ == '__main__':
     print('[+] Launch preprocess.py')
 
-    default_config = yaml.full_load(open('./preprocess/config.yaml', 'r'))
+    dir = Path(__file__).parent.absolute()
+
+    default_config = yaml.full_load(open(os.path.join(dir, 'config.yaml'), 'r'))
 
     parser = argparse.ArgumentParser(description='Preprocess dataset')
 

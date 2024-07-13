@@ -73,7 +73,7 @@ def generate():
 
 
 if __name__ == '__main__':
-    default_config = yaml.full_load(open('generation/config.yaml', 'r'))
+    default_config = yaml.full_load(open(os.path.join(dir, 'config.yaml'), 'r'))
 
     parser = argparse.ArgumentParser(description='Generate music')
 

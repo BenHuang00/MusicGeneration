@@ -118,7 +118,7 @@ def train(model_config, train_loader, val_loader, test_loader):
 
 
 def optuna_objective(trial, train_loader, val_loader, test_loader):
-    optuna_config = yaml.full_load(open('models/config_optuna.yaml', 'r'))
+    optuna_config = yaml.full_load(open(os.path.join(dir, '../models/config_optuna.yaml'), 'r'))
     model_config = model_cfg[cfg.model]
 
     for key, val in optuna_config[cfg.model].items():
@@ -187,7 +187,7 @@ def check_config():
 if __name__ == '__main__':
     print('Start training')
 
-    default_config = yaml.full_load(open('train/config.yaml', 'r'))
+    default_config = yaml.full_load(open(os.path.join(dir, 'config.yaml'), 'r'))
 
     parser = argparse.ArgumentParser(description='Train model')
 
@@ -219,7 +219,7 @@ if __name__ == '__main__':
 
     cfg = parser.parse_args()
 
-    model_cfg = yaml.full_load(open('models/config.yaml', 'r'))
+    model_cfg = yaml.full_load(open(os.path.join(dir, '../models/config.yaml'), 'r'))
 
     check_config()
 

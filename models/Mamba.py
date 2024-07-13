@@ -6,7 +6,7 @@ class Mamba(nn.Module):
     def __init__(self, config):
         super().__init__()
 
-        num_tokens = config['num_tokens']
+        self.num_tokens = config['num_tokens']
 
         self.d_model = config['d_model']
         self.d_state = config['d_state']
@@ -15,11 +15,11 @@ class Mamba(nn.Module):
 
         self.dropout = config['dropout']
 
-        self.embedding = nn.Embedding(num_tokens, self.d_model)
+        self.embedding = nn.Embedding(self.num_tokens, self.d_model)
         self.dropout1 = nn.Dropout(self.dropout)
         self.mamba = Mamba_ssm(self.d_model, self.d_state, self.d_conv, self.expand)
         self.dropout2 = nn.Dropout(self.dropout)
-        self.fc = nn.Linear(self.d_model, num_tokens)
+        self.fc = nn.Linear(self.d_model, self.num_tokens)
 
     def forward(self, x):
         x = self.embedding(x)

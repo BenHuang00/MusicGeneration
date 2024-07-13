@@ -36,7 +36,8 @@ def train_model(model, train_loader, val_loader):
 
     history = {'train_loss': [], 'val_loss': []}
 
-    print(f'Start training {model.__class__.__name__} model')
+    print(f'[!] Start training {model.__class__.__name__} model')
+    print(model)
 
     for epoch in range(cfg.epochs):
         model.train()
@@ -66,7 +67,7 @@ def train_model(model, train_loader, val_loader):
         history['val_loss'].append(val_loss)
 
         print(
-            f'Epoch {epoch + 1}/{cfg.epochs}({datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}) - Train Loss: {train_loss:.4f} - Val Loss: {val_loss:.4f}')
+            f'[!] Epoch {epoch + 1}/{cfg.epochs}({datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}) - Train Loss: {train_loss:.4f} - Val Loss: {val_loss:.4f}')
 
         torch.save(model.state_dict(),
                    os.path.join(f'{cfg.output_path}/models',
@@ -84,7 +85,7 @@ def train_model(model, train_loader, val_loader):
 
     draw_loss_curve(history, model.__class__.__name__)
 
-    print('Training completed')
+    print('[+] Training completed')
 
 
 def test_model(model, test_loader):
@@ -137,9 +138,8 @@ def optuna_objective(trial, train_loader, val_loader, test_loader):
 def main():
     wandb.login(key=cfg.wandb_key)
 
-    print(f'Start loading dataset from {cfg.preprocess_path}')
     dataset = load_file(os.path.join(cfg.preprocess_path, 'gpdataset.pkl'))
-    print(f'Loaded dataset: {len(dataset)} windows')
+    print(f'[+] Loaded dataset: {len(dataset)} windows')
 
     train_size = int(len(dataset) * cfg.train_scale)
     val_size = int(len(dataset) * cfg.val_scale)
@@ -164,7 +164,7 @@ def main():
     if not cfg.optuna:
         train(model_config, train_loader, val_loader, test_loader)
     else:
-        print(f'Start training {cfg.model} model with Optuna')
+        print(f'[!] Start training {cfg.model} model with Optuna')
         os.makedirs(os.path.join(cfg.output_path, 'optuna'), exist_ok=True)
         study = optuna.create_study(study_name=f'MIR-Project-{cfg.model}', direction='minimize')
         study.optimize(lambda trial: optuna_objective(trial, train_loader, val_loader, test_loader), n_trials=50)
@@ -181,11 +181,11 @@ def check_config():
     assert cfg.batch_size > 0, f'Invalid batch_size: {cfg.batch_size}'
     assert cfg.epochs > 0, f'Invalid epochs: {cfg.epochs}'
     assert cfg.lr > 0, f'Invalid lr: {cfg.lr}'
-    print('Config checked')
+    print('[+] Config checked')
 
 
 if __name__ == '__main__':
-    print('Start training')
+    print('[+] Launch train.py')
 
     default_config = yaml.full_load(open(os.path.join(dir, 'config.yaml'), 'r'))
 
@@ -220,6 +220,14 @@ if __name__ == '__main__':
     cfg = parser.parse_args()
 
     model_cfg = yaml.full_load(open(os.path.join(dir, '../models/config.yaml'), 'r'))
+
+    print('[!] Preprocess Configuration:')
+    for key, value in vars(cfg).items():
+        if key == 'wandb_key':
+            for i in range(len(value)):
+                print(f'[!]\t{key}: {"*" * (len(value) - 4) + value[-4:]}')
+        else:
+            print(f'[!]\t{key}: {value}')
 
     check_config()
 

@@ -21,10 +21,10 @@ def preprocess_tokens2ids(tokens, tokens2ids_path, ids2tokens_path):
             id2token[token2id[token]] = token
 
     save_file(token2id, tokens2ids_path)
-    print(f'Saved tokens2ids: {len(token2id)} tokens')
+    print(f'[+] Saved tokens2ids: {len(token2id)} tokens')
 
     save_file(id2token, ids2tokens_path)
-    print(f'Saved ids2tokens: {len(id2token)} tokens')
+    print(f'[+] Saved ids2tokens: {len(id2token)} tokens')
 
     return token2id, id2token
 
@@ -48,12 +48,12 @@ def preprocess_dataset(metadata, tokens2ids):
                 split_data.append((window_ids, target_id))
         except FileNotFoundError:
             not_found_list.append(token_path)
-    print(f'Not found: {not_found_list}')
-    print(f'Preprocessed dataset: {len(split_data)} windows')
+    print(f'[!] Not found: {not_found_list}')
+    print(f'[+] Preprocessed dataset: {len(split_data)} windows')
     num_tokens = len(tokens2ids)
     dataset = GPDataset(split_data, num_tokens)
     save_file(dataset, os.path.join(cfg.preprocess_path, 'gpdataset.pkl'))
-    print(f'Saved dataset: {len(dataset)} windows')
+    print(f'[+] Saved dataset: {len(dataset)} windows')
 
 
 def preprocess():
@@ -63,17 +63,14 @@ def preprocess():
     tokens2ids_path = os.path.join(cfg.preprocess_path, 'tokens2ids.json')
     ids2tokens_path = os.path.join(cfg.preprocess_path, 'ids2tokens.json')
 
-    print('Preprocessing dataset...')
-
     metadata = load_file(dataset_all_metadata_path)
-    print(f'Loaded metadata: {len(metadata)} songs')
+    print(f'[+] Loaded metadata: {len(metadata)} songs')
 
     tokens = load_file(dataset_all_tokens_path)
-    print(f'Loaded tokens: {len(tokens)} tokens')
+    print(f'[+] Loaded tokens: {len(tokens)} tokens')
 
     tokens2ids, ids2tokens = preprocess_tokens2ids(tokens, tokens2ids_path, ids2tokens_path)
 
-    print('Preprocessing dataset...')
     preprocess_dataset(metadata, tokens2ids)
 
 
@@ -81,10 +78,13 @@ def check_config():
     assert os.path.exists(cfg.dataset_path), f'Not found: {cfg.dataset_path}'
     assert cfg.window_size > 0, f'Invalid window size: {cfg.window_size}'
     assert cfg.window_step > 0, f'Invalid window step: {cfg.window_step}'
-    print('Config checked')
+    assert cfg.exluce_header in [True, False], f'Invalid exclude_header: {cfg.exclude_header}'
+    print('[+] Config checked')
 
 
 if __name__ == '__main__':
+    print('[+] Launch preprocess.py')
+
     default_config = yaml.full_load(open('preprocess/config.yaml', 'r'))
 
     parser = argparse.ArgumentParser(description='Preprocess dataset')
@@ -102,6 +102,10 @@ if __name__ == '__main__':
                         help='Exclude header of the file')
 
     cfg = parser.parse_args()
+
+    print('[!] Preprocess Configuration:')
+    for key, value in vars(cfg).items():
+        print(f'[!]\t{key}: {value}')
 
     check_config()
 

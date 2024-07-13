@@ -85,7 +85,7 @@ def check_config():
 if __name__ == '__main__':
     print('[+] Launch preprocess.py')
 
-    default_config = yaml.full_load(open('preprocess/config.yaml', 'r'))
+    default_config = yaml.full_load(open('./preprocess/config.yaml', 'r'))
 
     parser = argparse.ArgumentParser(description='Preprocess dataset')
 

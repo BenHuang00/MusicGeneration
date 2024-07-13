@@ -214,7 +214,7 @@ if __name__ == '__main__':
         device = 'mps'
     parser.add_argument('--device', type=str, default=device, help='Device')
 
-    wandb_config = yaml.full_load(open('wandb_config.yaml', 'r'))
+    wandb_config = yaml.full_load(open(os.path.join(dir, '../wandb_config.yaml'), 'r'))
 
     parser.add_argument('--wandb_project', type=str, default=wandb_config['WANDB']['wandb_project'], help='Wandb project name')
     parser.add_argument('--wandb_entity', type=str, default=wandb_config['WANDB']['wandb_entity'], help='Wandb entity name')

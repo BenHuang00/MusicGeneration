@@ -227,8 +227,7 @@ if __name__ == '__main__':
     print('[!] Preprocess Configuration:')
     for key, value in vars(cfg).items():
         if key == 'wandb_key':
-            for i in range(len(value)):
-                print(f'[!]\t{key}: {"*" * (len(value) - 4) + value[-4:]}')
+            print(f'[!]\t{key}: {"*" * (len(value) - 4) + value[-4:]}')
         else:
             print(f'[!]\t{key}: {value}')
 

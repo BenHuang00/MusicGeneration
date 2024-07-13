@@ -79,7 +79,7 @@ def check_config():
     assert os.path.exists(cfg.dataset_path), f'Not found: {cfg.dataset_path}'
     assert cfg.window_size > 0, f'Invalid window size: {cfg.window_size}'
     assert cfg.window_step > 0, f'Invalid window step: {cfg.window_step}'
-    assert cfg.exluce_header in [True, False], f'Invalid exclude_header: {cfg.exclude_header}'
+    assert cfg.exclude_header in [True, False], f'Invalid exclude_header: {cfg.exclude_header}'
     print('[+] Config checked')
 
 

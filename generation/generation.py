@@ -1,5 +1,6 @@
 import os
 import sys
+from pathlib import Path
 
 import yaml
 
@@ -73,6 +74,10 @@ def generate():
 
 
 if __name__ == '__main__':
+    print('[+] Launch generation.py')
+
+    dir = Path(__file__).parent.absolute()
+
     default_config = yaml.full_load(open(os.path.join(dir, 'config.yaml'), 'r'))
 
     parser = argparse.ArgumentParser(description='Generate music')

@@ -1,3 +1,5 @@
+.gitignore
+
 .idea
 
 datasets
@@ -14,3 +16,5 @@ config.yaml
 config_optuna.yaml
 
 __pycache__
+
+prompt*.txt

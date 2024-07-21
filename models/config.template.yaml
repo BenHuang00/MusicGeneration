@@ -5,6 +5,13 @@ LSTM:
   bidirectional: True
   dropout: 0.5
 
+GRU:
+  embedding_size: 256
+  hidden_size: 512
+  num_layers: 2
+  bidirectional: True
+  dropout: 0.5
+
 Transformer:
   nhead: 8
   num_encoder_layers: 6
@@ -35,3 +42,10 @@ TransformerXL:
   attn_type: 0
   clamp_len: -1
   sample_softmax: -1
+
+Mamba:
+  d_model: 128
+  d_state: 64
+  d_conv: 8
+  expand: 2
+  dropout: 0.1

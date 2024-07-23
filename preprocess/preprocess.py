@@ -37,16 +37,15 @@ def preprocess_dataset(metadata, tokens2ids):
         token_path = os.path.join(cfg.dataset_path, value['tokens.txt'])
         try:
             tokens = load_file(token_path).split()
+            tokens = [tokens2ids[token] for token in tokens if token in tokens2ids]
             if not cfg.exclude_header:
                 tokens = tokens[:-1]
             else:
                 tokens = tokens[4:-1]
             for i in range(0, len(tokens) - cfg.window_size, cfg.window_step):
                 window = tokens[i:i + cfg.window_size]
-                window_ids = [tokens2ids[token] for token in window]
                 target = tokens[i + cfg.window_size]
-                target_id = tokens2ids[target]
-                split_data.append((window_ids, target_id))
+                split_data.append((window, target))
         except FileNotFoundError:
             not_found_list.append(token_path)
     print(f'[!] Not found: {not_found_list}')

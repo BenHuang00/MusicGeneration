@@ -1,6 +1,8 @@
 import os
 import json
 import pickle
+import psutil
+import GPUtil
 
 
 def make_file_path(path):
@@ -70,3 +72,23 @@ def load_file(file_path):
         return _load_txt(file_path)
     else:
         raise ValueError(f'Unsupported file extension: {file_ext}')
+
+def get_system_info():
+    print(f'[!] System Information:')
+    print(f'[!]      General Information:')
+    print(f'[!]            OS: {os.name}')
+    print(f'[!]      CPU Information:')
+    print(f'[!]            Physical cores: {psutil.cpu_count(logical=False)}')
+    print(f'[!]            Logical cores: {psutil.cpu_count(logical=True)}')
+    print(f'[!]            Max CPU Frequency: {psutil.cpu_freq().max:.2f}Mhz')
+    print(f'[!]            Min CPU Frequency: {psutil.cpu_freq().min:.2f}Mhz')
+    print(f'[!]      Memory Information:')
+    print(f'[!]            Total Memory: {psutil.virtual_memory().total / 1024**3:.2f}GB')
+
+    gpus_info = GPUtil.getGPUs()
+    for gpu_info in gpus_info:
+        print(f'[!]      GPU Information:')
+        print(f'[!]            Name: {gpu_info.name}')
+        print(f'[!]            Memory: {gpu_info.memoryTotal:.0f}MB')
+        print(f'[!]            Max GPU Frequency: {gpu_info.maxFrequency:.2f}Mhz')
+        print(f'[!]            Min GPU Frequency: {gpu_info.minFrequency:.2f}Mhz')

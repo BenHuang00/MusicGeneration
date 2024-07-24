@@ -18,7 +18,7 @@ import matplotlib.pyplot as plt
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
-from utils.utils import load_file, save_file
+from utils.utils import load_file, save_file, get_system_info
 from models import *
 
 
@@ -109,6 +109,12 @@ def train(model_config, train_loader, val_loader, test_loader):
     wandb.init(project=cfg.wandb_project, entity=cfg.wandb_entity, config=model_config)
 
     model = eval(cfg.model)(model_config)
+
+    if cfg.device == 'cuda':
+        if torch.cuda.device_count() > 1:
+            print(f"[!] Use {torch.cuda.device_count()} GPUs")
+            model = nn.DataParallel(model)
+
     model.to(cfg.device)
 
     train_model(model, train_loader, val_loader)
@@ -232,5 +238,7 @@ if __name__ == '__main__':
             print(f'[!]      {key}: {value}')
 
     check_config()
+
+    get_system_info()
 
     main()

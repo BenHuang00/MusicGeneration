@@ -97,7 +97,7 @@ def test_model(model, test_loader):
         for i, (inputs, targets) in tqdm(enumerate(test_loader), desc=f'Testing', total=len(test_loader)):
             inputs, targets = inputs.to(cfg.device), targets.to(cfg.device)
             outputs = model(inputs, inputs[:, -1])
-            loss = criterion(outputs.view(-1, model.num_tokens), targets.view(-1))
+            loss = criterion(outputs.view(-1, (model if not isinstance(model, nn.DataParallel) else model.module).num_tokens), targets.view(-1))
             test_loss += loss.item()
         test_loss /= len(test_loader)
         print(f'Test Loss: {test_loss:.4f}')

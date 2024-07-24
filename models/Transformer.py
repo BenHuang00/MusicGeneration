@@ -21,12 +21,15 @@ class Transformer(nn.Module):
             num_decoder_layers=self.num_encoder_layers,
             d_model=self.d_model,
             dim_feedforward=self.dim_feedforward,
-            dropout=self.dropout
+            dropout=self.dropout,
+            batch_first=True,
         )
         self.fc = nn.Linear(self.d_model, self.num_tokens)
 
-    def forward(self, x):
-        x = self.embedding(x)
-        out = self.transformer(x, x)
+    def forward(self, src, tgt):
+        tgt = tgt.unsqueeze(-1)
+        src = self.embedding(src)
+        tgt = self.embedding(tgt)
+        out = self.transformer(src, tgt)
         out = self.fc(out[:, -1])
         return out

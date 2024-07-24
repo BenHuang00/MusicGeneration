@@ -46,7 +46,7 @@ def train_model(model, train_loader, val_loader):
         for i, (inputs, targets) in tqdm(enumerate(train_loader), desc=f'Epoch {epoch + 1}/{cfg.epochs}', total=len(train_loader)):
             inputs, targets = inputs.to(cfg.device), targets.to(cfg.device)
             optimizer.zero_grad()
-            outputs = model(inputs)
+            outputs = model(inputs, targets)
             loss = criterion(outputs.view(-1, model.num_tokens), targets.view(-1))
             loss.backward()
             optimizer.step()
@@ -59,7 +59,7 @@ def train_model(model, train_loader, val_loader):
         with torch.no_grad():
             for i, (inputs, targets) in tqdm(enumerate(val_loader), desc=f'Validation', total=len(val_loader)):
                 inputs, targets = inputs.to(cfg.device), targets.to(cfg.device)
-                outputs = model(inputs)
+                outputs = model(inputs, targets)
                 loss = criterion(outputs.view(-1, model.num_tokens), targets.view(-1))
                 val_loss += loss.item()
         val_loss /= len(val_loader)
@@ -96,7 +96,7 @@ def test_model(model, test_loader):
     with torch.no_grad():
         for i, (inputs, targets) in tqdm(enumerate(test_loader), desc=f'Testing', total=len(test_loader)):
             inputs, targets = inputs.to(cfg.device), targets.to(cfg.device)
-            outputs = model(inputs)
+            outputs = model(inputs, inputs[:, -1])
             loss = criterion(outputs.view(-1, model.num_tokens), targets.view(-1))
             test_loss += loss.item()
         test_loss /= len(test_loader)
@@ -227,9 +227,9 @@ if __name__ == '__main__':
     print('[!] Preprocess Configuration:')
     for key, value in vars(cfg).items():
         if key == 'wandb_key':
-            print(f'[!]\t{key}: {"*" * (len(value) - 4) + value[-4:]}')
+            print(f'[!]      {key}: {"*" * (len(value) - 4) + value[-4:]}')
         else:
-            print(f'[!]\t{key}: {value}')
+            print(f'[!]      {key}: {value}')
 
     check_config()
 

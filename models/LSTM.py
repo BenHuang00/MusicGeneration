@@ -17,8 +17,8 @@ class LSTM(nn.Module):
         self.lstm = nn.LSTM(self.embedding_size, self.hidden_size, self.num_layers, batch_first=True, bidirectional=self.bidirectional, dropout=self.dropout)
         self.fc = nn.Linear(self.hidden_size * (2 if self.bidirectional else 1), self.num_tokens)
 
-    def forward(self, x):
-        x = self.embedding(x)
-        out, _ = self.lstm(x)
+    def forward(self, src, tgt):
+        src = self.embedding(src)
+        out, _ = self.lstm(src)
         out = self.fc(out[:, -1, :])
         return out

@@ -18,7 +18,7 @@ import matplotlib.pyplot as plt
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
-from utils.utils import load_file, save_file, get_system_info
+from utils.utils import load_file, save_file, get_system_info, get_original_model
 from models import *
 
 
@@ -47,7 +47,7 @@ def train_model(model, train_loader, val_loader):
             inputs, targets = inputs.to(cfg.device), targets.to(cfg.device)
             optimizer.zero_grad()
             outputs = model(inputs, targets)
-            loss = criterion(outputs.view(-1, model.num_tokens), targets.view(-1))
+            loss = criterion(outputs.view(-1, get_original_model(model).num_tokens), targets.view(-1))
             loss.backward()
             optimizer.step()
             train_loss += loss.item()
@@ -60,7 +60,7 @@ def train_model(model, train_loader, val_loader):
             for i, (inputs, targets) in tqdm(enumerate(val_loader), desc=f'Validation', total=len(val_loader)):
                 inputs, targets = inputs.to(cfg.device), targets.to(cfg.device)
                 outputs = model(inputs, targets)
-                loss = criterion(outputs.view(-1, model.num_tokens), targets.view(-1))
+                loss = criterion(outputs.view(-1, get_original_model(model).num_tokens), targets.view(-1))
                 val_loss += loss.item()
         val_loss /= len(val_loader)
 
@@ -77,12 +77,13 @@ def train_model(model, train_loader, val_loader):
         torch.save(model,
                    os.path.join(f'{cfg.output_path}/models', f'{model.__class__.__name__}_model-{wandb.run.id}-{epoch + 1}-full.pth')
                    )
-        save_file(history,
-                  os.path.join(f'{cfg.output_path}/history',
-                               f'{model.__class__.__name__}_history-{wandb.run.id}-{epoch + 1}.json')
-                  )
 
         wandb.log({"train_loss": train_loss, "val_loss": val_loss, 'epoch': epoch + 1})
+
+    save_file(history,
+              os.path.join(f'{cfg.output_path}/history',
+                           f'{model.__class__.__name__}_history-{wandb.run.id}.json')
+              )
 
     draw_loss_curve(history, model.__class__.__name__)
 
@@ -97,7 +98,7 @@ def test_model(model, test_loader):
         for i, (inputs, targets) in tqdm(enumerate(test_loader), desc=f'Testing', total=len(test_loader)):
             inputs, targets = inputs.to(cfg.device), targets.to(cfg.device)
             outputs = model(inputs, inputs[:, -1])
-            loss = criterion(outputs.view(-1, (model if not isinstance(model, nn.DataParallel) else model.module).num_tokens), targets.view(-1))
+            loss = criterion(outputs.view(-1, get_original_model(model).num_tokens), targets.view(-1))
             test_loss += loss.item()
         test_loss /= len(test_loader)
         print(f'Test Loss: {test_loss:.4f}')
@@ -119,6 +120,17 @@ def train(model_config, train_loader, val_loader, test_loader):
 
     train_model(model, train_loader, val_loader)
     test_loss = test_model(model, test_loader)
+
+    model = get_original_model(model)
+    model.to('cpu')
+    torch.save(model.state_dict(),
+               os.path.join(f'{cfg.output_path}/models',
+                            f'{model.__class__.__name__}_model-{wandb.run.id}.pth')
+               )
+    torch.save(model,
+               os.path.join(f'{cfg.output_path}/models',
+                            f'{model.__class__.__name__}_model-{wandb.run.id}-full.pth')
+               )
 
     wandb.finish()
 

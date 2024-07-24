@@ -3,6 +3,7 @@ import json
 import pickle
 import psutil
 import GPUtil
+import torch.nn as nn
 
 
 def make_file_path(path):
@@ -73,6 +74,7 @@ def load_file(file_path):
     else:
         raise ValueError(f'Unsupported file extension: {file_ext}')
 
+
 def get_system_info():
     print(f'[!] System Information:')
     print(f'[!]      General Information:')
@@ -90,3 +92,9 @@ def get_system_info():
         print(f'[!]      GPU Information:')
         print(f'[!]            Name: {gpu_info.name}')
         print(f'[!]            Memory: {gpu_info.memoryTotal:.0f}MB')
+
+
+def get_original_model(model):
+    if isinstance(model, nn.DataParallel):
+        return model.module
+    return model

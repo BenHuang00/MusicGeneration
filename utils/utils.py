@@ -90,5 +90,3 @@ def get_system_info():
         print(f'[!]      GPU Information:')
         print(f'[!]            Name: {gpu_info.name}')
         print(f'[!]            Memory: {gpu_info.memoryTotal:.0f}MB')
-        print(f'[!]            Max GPU Frequency: {gpu_info.maxFrequency:.2f}Mhz')
-        print(f'[!]            Min GPU Frequency: {gpu_info.minFrequency:.2f}Mhz')

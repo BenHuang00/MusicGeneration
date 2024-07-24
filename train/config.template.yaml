@@ -2,6 +2,7 @@ INFERENCE:
   preprocess_path: ./datasets/DadaGP-v1.1-preprocessed
   output_path: ./output
   optuna: True
+  optuna_trials: 20
 
 TRAIN:
   model: LSTM

@@ -203,6 +203,7 @@ if __name__ == '__main__':
     parser.add_argument('--preprocess_path', type=str, default=default_config['INFERENCE']['preprocess_path'], help='Path to the preprocessed dataset')
     parser.add_argument('--output_path', type=str, default=default_config['INFERENCE']['output_path'], help='Path to the output directory')
     parser.add_argument('--optuna', action='store_true', default=default_config['INFERENCE']['optuna'], help='Optuna hyperparameter optimization')
+    parser.add_argument('--optuna_trials', type=int, default=default_config['INFERENCE']['optuna_trials'], help='Number of Optuna trials')
 
     parser.add_argument('--model', type=str, default=default_config['TRAIN']['model'], help='Model name')
 

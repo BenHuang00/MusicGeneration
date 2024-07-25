@@ -37,7 +37,7 @@ def train_model(model, train_loader, val_loader):
 
     history = {'train_loss': [], 'val_loss': []}
 
-    print(f'[!] Start training {model.__class__.__name__} model')
+    print(f'[!] Start training {get_original_model(model).__class__.__name__} model')
     print(model)
 
     for epoch in range(cfg.epochs):

@@ -21,10 +21,10 @@ class Mamba(nn.Module):
         self.dropout2 = nn.Dropout(self.dropout)
         self.fc = nn.Linear(self.d_model, self.num_tokens)
 
-    def forward(self, x):
-        x = self.embedding(x)
-        x = self.dropout1(x)
-        x = self.mamba(x)
-        x = self.dropout2(x)
-        out = self.fc(x[:, -1, :])
+    def forward(self, src, tgt):
+        src = self.embedding(src)
+        src = self.dropout1(src)
+        src = self.mamba(src)
+        src = self.dropout2(src)
+        out = self.fc(src[:, -1, :])
         return out

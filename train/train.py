@@ -18,7 +18,7 @@ import matplotlib.pyplot as plt
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
-from utils.utils import load_file, save_file
+from utils.utils import load_file, save_file, get_system_info, get_original_model
 from models import *
 
 
@@ -37,7 +37,7 @@ def train_model(model, train_loader, val_loader):
 
     history = {'train_loss': [], 'val_loss': []}
 
-    print(f'[!] Start training {model.__class__.__name__} model')
+    print(f'[!] Start training {get_original_model(model).__class__.__name__} model')
     print(model)
 
     for epoch in range(cfg.epochs):
@@ -47,7 +47,7 @@ def train_model(model, train_loader, val_loader):
             inputs, targets = inputs.to(cfg.device), targets.to(cfg.device)
             optimizer.zero_grad()
             outputs = model(inputs, targets)
-            loss = criterion(outputs.view(-1, model.num_tokens), targets.view(-1))
+            loss = criterion(outputs.view(-1, get_original_model(model).num_tokens), targets.view(-1))
             loss.backward()
             optimizer.step()
             train_loss += loss.item()
@@ -60,7 +60,7 @@ def train_model(model, train_loader, val_loader):
             for i, (inputs, targets) in tqdm(enumerate(val_loader), desc=f'Validation', total=len(val_loader)):
                 inputs, targets = inputs.to(cfg.device), targets.to(cfg.device)
                 outputs = model(inputs, targets)
-                loss = criterion(outputs.view(-1, model.num_tokens), targets.view(-1))
+                loss = criterion(outputs.view(-1, get_original_model(model).num_tokens), targets.view(-1))
                 val_loss += loss.item()
         val_loss /= len(val_loader)
 
@@ -77,12 +77,13 @@ def train_model(model, train_loader, val_loader):
         torch.save(model,
                    os.path.join(f'{cfg.output_path}/models', f'{model.__class__.__name__}_model-{wandb.run.id}-{epoch + 1}-full.pth')
                    )
-        save_file(history,
-                  os.path.join(f'{cfg.output_path}/history',
-                               f'{model.__class__.__name__}_history-{wandb.run.id}-{epoch + 1}.json')
-                  )
 
         wandb.log({"train_loss": train_loss, "val_loss": val_loss, 'epoch': epoch + 1})
+
+    save_file(history,
+              os.path.join(f'{cfg.output_path}/history',
+                           f'{model.__class__.__name__}_history-{wandb.run.id}.json')
+              )
 
     draw_loss_curve(history, model.__class__.__name__)
 
@@ -97,7 +98,7 @@ def test_model(model, test_loader):
         for i, (inputs, targets) in tqdm(enumerate(test_loader), desc=f'Testing', total=len(test_loader)):
             inputs, targets = inputs.to(cfg.device), targets.to(cfg.device)
             outputs = model(inputs, inputs[:, -1])
-            loss = criterion(outputs.view(-1, model.num_tokens), targets.view(-1))
+            loss = criterion(outputs.view(-1, get_original_model(model).num_tokens), targets.view(-1))
             test_loss += loss.item()
         test_loss /= len(test_loader)
         print(f'Test Loss: {test_loss:.4f}')
@@ -109,10 +110,27 @@ def train(model_config, train_loader, val_loader, test_loader):
     wandb.init(project=cfg.wandb_project, entity=cfg.wandb_entity, config=model_config)
 
     model = eval(cfg.model)(model_config)
+
+    if cfg.device == 'cuda':
+        if torch.cuda.device_count() > 1:
+            print(f"[!] Use {torch.cuda.device_count()} GPUs")
+            model = nn.DataParallel(model)
+
     model.to(cfg.device)
 
     train_model(model, train_loader, val_loader)
     test_loss = test_model(model, test_loader)
+
+    model = get_original_model(model)
+    model.to('cpu')
+    torch.save(model.state_dict(),
+               os.path.join(f'{cfg.output_path}/models',
+                            f'{model.__class__.__name__}_model-{wandb.run.id}.pth')
+               )
+    torch.save(model,
+               os.path.join(f'{cfg.output_path}/models',
+                            f'{model.__class__.__name__}_model-{wandb.run.id}-full.pth')
+               )
 
     wandb.finish()
 
@@ -168,7 +186,7 @@ def main():
         print(f'[!] Start training {cfg.model} model with Optuna')
         os.makedirs(os.path.join(cfg.output_path, 'optuna'), exist_ok=True)
         study = optuna.create_study(study_name=f'MIR-Project-{cfg.model}', direction='minimize')
-        study.optimize(lambda trial: optuna_objective(trial, train_loader, val_loader, test_loader), n_trials=50)
+        study.optimize(lambda trial: optuna_objective(trial, train_loader, val_loader, test_loader), n_trials=cfg.optuna_trials)
         save_file(study.best_params, os.path.join(f'{cfg.output_path}/optuna', f'{cfg.model}_best_params.json'))
         save_file(study, os.path.join(f'{cfg.output_path}/optuna', f'{cfg.model}_study.pkl'))
 
@@ -197,6 +215,7 @@ if __name__ == '__main__':
     parser.add_argument('--preprocess_path', type=str, default=default_config['INFERENCE']['preprocess_path'], help='Path to the preprocessed dataset')
     parser.add_argument('--output_path', type=str, default=default_config['INFERENCE']['output_path'], help='Path to the output directory')
     parser.add_argument('--optuna', action='store_true', default=default_config['INFERENCE']['optuna'], help='Optuna hyperparameter optimization')
+    parser.add_argument('--optuna_trials', type=int, default=default_config['INFERENCE']['optuna_trials'], help='Number of Optuna trials')
 
     parser.add_argument('--model', type=str, default=default_config['TRAIN']['model'], help='Model name')
 
@@ -232,5 +251,7 @@ if __name__ == '__main__':
             print(f'[!]      {key}: {value}')
 
     check_config()
+
+    get_system_info()
 
     main()

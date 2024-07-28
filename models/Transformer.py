@@ -31,5 +31,5 @@ class Transformer(nn.Module):
         src = self.embedding(src)
         tgt = self.embedding(tgt)
         out = self.transformer(src, tgt)
-        out = self.fc(out[:, -1])
+        out = self.fc(out[:, -1, :])
         return out

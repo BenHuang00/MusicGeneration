@@ -2,7 +2,7 @@ from torch import nn
 from mamba_ssm import Mamba2 as Mamba_ssm
 
 
-class Mamba(nn.Module):
+class Mamba2(nn.Module):
     def __init__(self, config):
         super().__init__()
 

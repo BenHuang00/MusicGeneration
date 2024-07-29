@@ -85,3 +85,25 @@ Mamba:
     TYPE: float
     MIN: 0.1
     MAX: 0.5
+
+Mamba2:
+  d_model:
+    TYPE: int
+    MIN: 64
+    MAX: 256
+  d_state:
+    TYPE: int
+    MIN: 32
+    MAX: 128
+  d_conv:
+    TYPE: int
+    MIN: 4
+    MAX: 16
+  expand:
+    TYPE: int
+    MIN: 1
+    MAX: 4
+  dropout:
+    TYPE: float
+    MIN: 0.1
+    MAX: 0.5

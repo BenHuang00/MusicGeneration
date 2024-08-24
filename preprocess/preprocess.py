@@ -55,6 +55,8 @@ def preprocess_dataset(metadata, tokens2ids):
     save_file(dataset, os.path.join(cfg.preprocess_path, 'gpdataset.pkl'))
     print(f'[+] Saved dataset: {len(dataset)} windows')
 
+    return dataset
+
 
 def preprocess():
     dataset_all_metadata_path = os.path.join(cfg.dataset_path, '_DadaGP_all_metadata.json')
@@ -71,7 +73,9 @@ def preprocess():
 
     tokens2ids, ids2tokens = preprocess_tokens2ids(tokens, tokens2ids_path, ids2tokens_path)
 
-    preprocess_dataset(metadata, tokens2ids)
+    dataset = preprocess_dataset(metadata, tokens2ids)
+
+    return dataset
 
 
 def check_config():
@@ -80,6 +84,34 @@ def check_config():
     assert cfg.window_step > 0, f'Invalid window step: {cfg.window_step}'
     assert cfg.exclude_header in [True, False], f'Invalid exclude_header: {cfg.exclude_header}'
     print('[+] Config checked')
+
+
+def interactive():
+    global cfg
+
+    print('[+] Launch preprocess.py')
+
+    dir = Path(__file__).parent.absolute()
+
+    default_config = yaml.full_load(open(os.path.join(dir, 'config.yaml'), 'r'))
+
+    cfg = argparse.Namespace()
+    cfg.dataset_path = default_config['INFERENCE']['dataset_path']
+    cfg.preprocess_path = default_config['INFERENCE']['preprocess_path']
+
+    cfg.window_size = int(default_config['PREPROCESS']['window_size'])
+    cfg.window_step = int(default_config['PREPROCESS']['window_step'])
+    cfg.exclude_header = bool(default_config['PREPROCESS']['exclude_header'])
+
+    print('[!] Preprocess Configuration:')
+    for key, value in vars(cfg).items():
+        print(f'[!]      \t{key}: {value}')
+
+    check_config()
+
+    dataset = preprocess()
+
+    return dataset
 
 
 if __name__ == '__main__':
@@ -107,7 +139,7 @@ if __name__ == '__main__':
 
     print('[!] Preprocess Configuration:')
     for key, value in vars(cfg).items():
-        print(f'[!]\t{key}: {value}')
+        print(f'[!]      \t{key}: {value}')
 
     check_config()
 

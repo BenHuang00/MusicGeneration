@@ -2,4 +2,7 @@ from .LSTM import LSTM
 from .GRU import GRU
 from .Transformer import Transformer
 from .TransformerXL import TransformerXL
-from .Mamba import Mamba
+try:
+    from .Mamba import Mamba
+except ImportError:
+    print('[-] Mamba cannot be imported')

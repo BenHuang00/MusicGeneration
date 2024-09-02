@@ -40,6 +40,30 @@ GRU:
       MIN: 0.1
       MAX: 0.5
 
+Transformer:
+  nhead:
+    TYPE: categorical
+    CHOICES: [4, 8, 16]
+  num_encoder_layers:
+    TYPE: int
+    MIN: 4
+    MAX: 16
+  num_decoder_layers:
+    TYPE: int
+    MIN: 4
+    MAX: 16
+  d_model:
+    TYPE: categorical
+    CHOICES: [128, 256, 512, 1024]
+  dim_feedforward:
+    TYPE: int
+    MIN: 1024
+    MAX: 4096
+  dropout:
+    TYPE: float
+    MIN: 0.1
+    MAX: 0.5
+
 Mamba:
   d_model:
     TYPE: int
@@ -57,6 +81,24 @@ Mamba:
     TYPE: int
     MIN: 1
     MAX: 4
+  dropout:
+    TYPE: float
+    MIN: 0.1
+    MAX: 0.5
+
+Mamba2:
+  d_model:
+    TYPE: categorical
+    CHOICES: [64, 128, 256, 512]
+  d_state:
+    TYPE: categorical
+    CHOICES: [64, 128]
+  d_conv:
+    TYPE: categorical
+    CHOICES: [4, 8, 16]
+  expand:
+    TYPE: categorical
+    CHOICES: [2, 4]
   dropout:
     TYPE: float
     MIN: 0.1

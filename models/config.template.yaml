@@ -49,3 +49,10 @@ Mamba:
   d_conv: 8
   expand: 2
   dropout: 0.1
+
+Mamba2:
+  d_model: 128
+  d_state: 64
+  d_conv: 8
+  expand: 2
+  dropout: 0.1
